@@ -57,7 +57,7 @@ export class RedisKeyStore extends BaseKeyStore {
         const pattern = `{${this.keyPrefix}:*`
         this.logger.info(`Clearing keys matching pattern ${pattern}`)
         const scanStream = this.redisClient.scanStream({
-          match: pattern
+          match: pattern,
         })
         scanStream.on('data', (keys: string[]) => {
           this.logger.info(`Deleting ${keys.length} keys`)
