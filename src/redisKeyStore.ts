@@ -3,17 +3,17 @@ import {
   IKeyStoreContextProvider,
   IKeyStoreValueProvider,
 } from '@bryopsida/key-store'
-import { Redis, Cluster } from 'ioredis'
+import { Redis } from 'ioredis'
 import { Logger } from 'pino'
 
 export class RedisKeyStore extends BaseKeyStore {
-  private readonly redisClient: Redis | Cluster
+  private readonly redisClient: Redis
   private readonly keyPrefix: string
   private readonly logger: Logger
 
   constructor(
     logger: Logger,
-    redisClient: Redis | Cluster,
+    redisClient: Redis,
     keyPrefix: string,
     keyStorePasswordProvider: IKeyStoreValueProvider,
     keyStoreSaltProvider: IKeyStoreValueProvider,
@@ -56,7 +56,9 @@ export class RedisKeyStore extends BaseKeyStore {
       try {
         const pattern = `{${this.keyPrefix}:*`
         this.logger.info(`Clearing keys matching pattern ${pattern}`)
-        const scanStream = this.redisClient.sscanStream(pattern)
+        const scanStream = this.redisClient.scanStream({
+          match: pattern
+        })
         scanStream.on('data', (keys: string[]) => {
           this.logger.info(`Deleting ${keys.length} keys`)
           keys.forEach((key) => {
