@@ -6,11 +6,23 @@ import {
 import { Redis } from 'ioredis'
 import { Logger } from 'pino'
 
+/**
+ * A child class of BaseKeyStore that stores the keys in Redis
+ */
 export class RedisKeyStore extends BaseKeyStore {
   private readonly redisClient: Redis
   private readonly keyPrefix: string
   private readonly logger: Logger
 
+  /**
+   *
+   * @param {Logger} logger Pino Logger instance
+   * @param {Redis} redisClient Redis client
+   * @param {string} keyPrefix prefix for keys, can be an anchor when using redis cluster
+   * @param {IKeyStoreValueProvider} keyStorePasswordProvider Fetch the password for the store
+   * @param {IKeyStoreValueProvider} keyStoreSaltProvider Fetch the salt for the store
+   * @param {IKeyStoreContextProvider} keyStoreContextProvider Fetch the context for the store
+   */
   constructor(
     logger: Logger,
     redisClient: Redis,
@@ -29,6 +41,9 @@ export class RedisKeyStore extends BaseKeyStore {
     this.keyPrefix = keyPrefix || 'hermes-key-store'
   }
 
+  /**
+   * @Inheritdoc
+   */
   protected async putKeyInSlot(keySlot: string, key: Buffer): Promise<void> {
     this.logger.trace(`Putting key in slot ${this.keyPrefix}:${keySlot}`)
     await this.redisClient.set(
@@ -37,6 +52,9 @@ export class RedisKeyStore extends BaseKeyStore {
     )
   }
 
+  /**
+   * @Inheritdoc
+   */
   protected async getKeyInSlot(keySlot: string): Promise<Buffer> {
     this.logger.trace(`Getting key in slot ${this.keyPrefix}:${keySlot}`)
     const val = await this.redisClient.get(`{${this.keyPrefix}:${keySlot}}`)
@@ -47,10 +65,16 @@ export class RedisKeyStore extends BaseKeyStore {
     }
   }
 
+  /**
+   * @Inheritdoc
+   */
   protected async deleteKeySlot(keySlot: string): Promise<void> {
     await this.redisClient.del(`{${this.keyPrefix}:${keySlot}}`)
   }
 
+  /**
+   * @Inheritdoc
+   */
   protected async clearKeySlots(): Promise<void> {
     return new Promise((resolve, reject) => {
       try {
@@ -85,10 +109,16 @@ export class RedisKeyStore extends BaseKeyStore {
     })
   }
 
+  /**
+   * @Inheritdoc
+   */
   protected async hasKeyInSlot(keySlot: string): Promise<boolean> {
     return (await this.redisClient.exists(`{${this.keyPrefix}:${keySlot}}`)) > 0
   }
 
+  /**
+   * @Inheritdoc
+   */
   async close(): Promise<void> {
     this.logger.info('Closing redis client')
     this.redisClient.disconnect(false)
