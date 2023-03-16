@@ -64,6 +64,6 @@
   "dependencies": {
     "@bryopsida/key-store": "^0.1.3",
     "ioredis": "^5.3.1",
-    "pino": "^8.10.0"
+    "pino": "^8.11.0"
   }
 }
