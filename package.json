@@ -39,7 +39,7 @@
   },
   "homepage": "https://github.com/bryopsida/redis-key-store#readme",
   "devDependencies": {
-    "@jest/globals": "29.7.0",
+    "@jest/globals": "30.0.0",
     "@types/ioredis": "^5.0.0",
     "@types/jest": "^29.0.0",
     "@types/node": "^22.0.0",
